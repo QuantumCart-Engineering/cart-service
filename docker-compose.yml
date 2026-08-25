@@ -1,0 +1,79 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: quantumcart-cart-mysql
+
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: quantumcart_cart
+      MYSQL_USER: quantumcart
+      MYSQL_PASSWORD: quantumcart_root
+
+    ports:
+      - "3308:3306"
+
+    volumes:
+      - cart_mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-proot"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+    networks:
+      - quantumcart-network
+
+  cart-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: quantumcart-cart-service
+
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: production
+      PORT: 8003
+
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: quantumcart
+      DB_PASSWORD: quantumcart_root
+      DB_NAME: quantumcart_cart
+      DB_CONNECTION_LIMIT: 10
+
+      DB_ROOT_USER: root
+      DB_ROOT_PASSWORD: root
+
+      PRODUCT_SERVICE_URL: http://quantumcart-product-service:8002
+
+    ports:
+      - "8003:8003"
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    networks:
+      - quantumcart-network
+
+volumes:
+  cart_mysql_data:
+
+networks:
+  quantumcart-network:
+    external: true
