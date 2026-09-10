@@ -203,7 +203,7 @@ jobs:
       # Run Cart migrations
       # =========================
       - name: Run Cart migrations
-        run: npm run migrate
+        run: node --env-file=.env.test -r ts-node/register/transpile-only src/scripts/migrate.ts
 
       # =========================
       # Integration tests
