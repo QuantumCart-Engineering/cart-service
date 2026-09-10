@@ -134,6 +134,8 @@ jobs:
       # =========================
       - name: Run Product migrations
         working-directory: product-service
+        env:
+          NODE_ENV: test
         run: npm run migrate
 
       # =========================
@@ -141,6 +143,8 @@ jobs:
       # =========================
       - name: Start Product Service
         working-directory: product-service
+        env:
+          NODE_ENV: test
         run: |
           nohup npm start > /tmp/product-service.log 2>&1 &
           echo $! > /tmp/product-service.pid
