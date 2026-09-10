@@ -169,6 +169,54 @@ jobs:
           exit 1
 
       # =========================
+      # Seed Product Service test product
+      #
+      # The Cart integration tests validate
+      # products through Product Service using
+      # a fixed product ID, so seed it directly
+      # in the Product MySQL database.
+      # =========================
+      - name: Seed Product Service test product
+        run: |
+          PRODUCT_MYSQL_CONTAINER=$(
+            docker ps \
+              --filter "publish=3307" \
+              --format "{{.ID}}"
+          )
+
+          docker exec \
+            -e MYSQL_PWD="${{ secrets.DB_TEST_PASSWORD }}" \
+            "$PRODUCT_MYSQL_CONTAINER" \
+            mysql \
+              -u"${{ secrets.DB_TEST_USER }}" \
+              quantumcart_products_test \
+              -e "
+                INSERT INTO products (
+                  id,
+                  sku,
+                  name,
+                  slug,
+                  description,
+                  price,
+                  currency,
+                  stock_quantity,
+                  status
+                ) VALUES (
+                  '83cb7256-2c66-44aa-90cf-49550570e925',
+                  'CI-SEED-PRODUCT',
+                  'CI Seed Product',
+                  'ci-seed-product',
+                  'CI seeded integration test product',
+                  9999.00,
+                  'INR',
+                  100,
+                  'ACTIVE'
+                )
+                ON DUPLICATE KEY UPDATE
+                  name = 'CI Seed Product'
+              "
+
+      # =========================
       # Create Cart test environment
       # =========================
       - name: Create Cart test environment
