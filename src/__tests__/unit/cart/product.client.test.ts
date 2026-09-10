@@ -1,5 +1,6 @@
 import {
-    getProductById
+    getProductById,
+    productServiceUrl
 } from "../../../clients/product/product.client";
 
 describe(
@@ -53,7 +54,7 @@ describe(
                 expect(
                     global.fetch
                 ).toHaveBeenCalledWith(
-                    "http://localhost:8002/api/v1/products/product-1"
+                    `${productServiceUrl}/api/v1/products/product-1`
                 );
 
                 expect(

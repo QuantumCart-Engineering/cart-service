@@ -26,7 +26,7 @@ export interface ProductDetails {
         | "INACTIVE";
 }
 
-const productServiceUrl =
+export const productServiceUrl =
     process.env.PRODUCT_SERVICE_URL ||
     "http://localhost:8002";
 
