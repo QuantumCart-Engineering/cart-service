@@ -263,7 +263,7 @@ jobs:
       # Coverage
       # =========================
       - name: Run test coverage
-        run: npm run test:coverage -- --runInBand
+        run: node --env-file=.env.test ./node_modules/jest/bin/jest.js --coverage --runInBand
 
       # =========================
       # Build Cart Service
