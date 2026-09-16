@@ -8,7 +8,8 @@ import {
     addCartItemController,
     updateCartItemController,
     removeCartItemController,
-    clearCartController
+    clearCartController,
+    checkoutCartController
 } from "../controllers/cart.controller";
 
 const router =
@@ -249,6 +250,42 @@ router.delete(
 router.delete(
     "/:cartId/items",
     clearCartController
+);
+
+/**
+ * @swagger
+ * /api/v1/cart/{cartId}/checkout:
+ *   patch:
+ *     summary: Checkout the user's cart
+ *     tags: [Cart]
+ *     parameters:
+ *       - name: cartId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - name: x-user-id
+ *         in: header
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     responses:
+ *       200:
+ *         description: Cart checked out successfully
+ *       400:
+ *         description: Cart is not active
+ *       401:
+ *         description: User ID is required
+ *       403:
+ *         description: Cart does not belong to the user
+ *       404:
+ *         description: Cart not found
+ */
+router.patch(
+    "/:cartId/checkout",
+    checkoutCartController
 );
 
 export default router;

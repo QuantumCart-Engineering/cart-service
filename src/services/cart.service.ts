@@ -23,7 +23,8 @@ import {
     updateCartItemQuantityRepository,
     deleteCartItemRepository,
     deleteCartItemsRepository,
-    CartWithItems
+    CartWithItems,
+    updateCartStatusRepository
 } from "../repositories/cart.repository";
 
 /**
@@ -298,4 +299,43 @@ export const clearCartService =
             message:
                 "Cart cleared successfully"
         };
+    };
+
+export const checkoutCartService =
+    async (
+        cartId: string,
+        userId: string
+    ): Promise<CartWithItems> => {
+        const cart =
+            await getCartByIdService(
+                cartId,
+                userId
+            );
+
+        if (
+            cart.status !== "ACTIVE"
+        ) {
+            throw new AppError(
+                "Cart is not active",
+                400
+            );
+        }
+
+        await updateCartStatusRepository(
+            cartId,
+            "CHECKED_OUT"
+        );
+
+        const updatedCart =
+            await findCartWithItemsRepository(
+                cartId
+            );
+
+        if (!updatedCart) {
+            throw new Error(
+                "Checked out cart could not be retrieved"
+            );
+        }
+
+        return updatedCart;
     };
