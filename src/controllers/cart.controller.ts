@@ -1,6 +1,7 @@
 import {
     Request,
-    Response
+    Response,
+    NextFunction
 } from "express";
 
 import {
@@ -9,7 +10,8 @@ import {
     addCartItemService,
     updateCartItemService,
     removeCartItemService,
-    clearCartService
+    clearCartService,
+    checkoutCartService
 } from "../services/cart.service";
 
 import {
@@ -291,4 +293,54 @@ export const clearCartController =
                 success: true,
                 ...result
             });
+    };
+
+export const checkoutCartController =
+    async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const userId =
+                request.headers["x-user-id"];
+
+            if (
+                typeof userId !== "string" ||
+                userId.trim() === ""
+            ) {
+                throw new AppError(
+                    "User ID is required",
+                    401
+                );
+            }
+
+            const cartId =
+                Array.isArray(request.params.cartId)
+                    ? request.params.cartId[0]
+                    : request.params.cartId;
+
+            if (
+                !cartId ||
+                cartId.trim() === ""
+            ) {
+                throw new AppError(
+                    "Cart ID is required",
+                    400
+                );
+            }
+
+            const cart =
+                await checkoutCartService(
+                    cartId,
+                    userId
+                );
+
+            response.status(200).json({
+                success: true,
+                data: cart
+            });
+        } catch (error) {
+            next(error);
+        }
     };
